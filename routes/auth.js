@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import User from "../models/User.js";
 
 const router = express.Router();
-
+// REST API - GET , POST
 router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -41,7 +41,13 @@ router.post("/login", async (req, res) => {
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
     );
-    res.status(200).json({ success: true, token });
+
+    // Return the user object so the frontend can store it
+    res.status(200).json({
+      success: true,
+      token,
+      user: { name: user.name, email: user.email },
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }

@@ -2,17 +2,44 @@ import express from "express";
 import authenticate from "../middleware/authenticate.js";
 import { clues } from "../data/clues.js";
 import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
 
 const router = express.Router();
 
-router.get("/clues", authenticate, (req, res) => {
-  res.status(200).json({ success: true, clues });
+const getSystemState = async () => {
+  let state = await SystemState.findOne({ singletonId: "sherlocked_state" });
+  if (!state) {
+    state = await SystemState.create({ isGameOver: false, leaderboard: [] });
+  }
+  return state;
+};
+
+// 1. GET /clues - Fetches the clues and the user's specific answers
+router.get("/clues", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      success: true,
+      clues,
+      submissions: user ? user.submissions : [],
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
 });
 
+// 2. POST /submit - Accepts answers only if the game is still active
 router.post("/submit", authenticate, async (req, res) => {
   try {
-    const { questionId, answer } = req.body;
+    const state = await getSystemState();
+    if (state.isGameOver) {
+      return res.status(403).json({
+        success: false,
+        message: "The case is closed. Submissions are locked.",
+      });
+    }
 
+    const { questionId, answer } = req.body;
     if (!questionId || !answer) {
       return res
         .status(400)
@@ -37,12 +64,24 @@ router.post("/submit", authenticate, async (req, res) => {
     }
 
     await user.save();
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: `Answer for Question ${questionId} locked in.`,
-      });
+    res.status(200).json({
+      success: true,
+      message: `Answer for Question ${questionId} locked in.`,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+// 3. GET /leaderboard - Public endpoint to check standings
+router.get("/leaderboard", async (req, res) => {
+  try {
+    const state = await getSystemState();
+    res.status(200).json({
+      success: true,
+      isGameOver: state.isGameOver,
+      leaderboard: state.leaderboard,
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: "Server error" });
   }
