@@ -9,17 +9,31 @@ const router = express.Router();
 const getSystemState = async () => {
   let state = await SystemState.findOne({ singletonId: "sherlocked_state" });
   if (!state) {
-    state = await SystemState.create({ isGameOver: false, leaderboard: [] });
+    state = await SystemState.create({
+      isGameStarted: false,
+      isGameOver: false,
+      leaderboard: [],
+    });
   }
   return state;
 };
 
-// 1. GET /clues - Fetches the clues and the user's specific answers
+// 1. GET /clues - Now hides clues if the game hasn't started
 router.get("/clues", authenticate, async (req, res) => {
   try {
+    const state = await getSystemState();
+
+    // If the game hasn't started, withhold the clues
+    if (!state.isGameStarted) {
+      return res
+        .status(200)
+        .json({ success: true, isGameStarted: false, clues: [] });
+    }
+
     const user = await User.findById(req.user.id);
     res.status(200).json({
       success: true,
+      isGameStarted: true,
       clues,
       submissions: user ? user.submissions : [],
     });
@@ -28,15 +42,23 @@ router.get("/clues", authenticate, async (req, res) => {
   }
 });
 
-// 2. POST /submit - Accepts answers only if the game is still active
+// 2. POST /submit - Block early birds and latecomers
 router.post("/submit", authenticate, async (req, res) => {
   try {
     const state = await getSystemState();
+
+    if (!state.isGameStarted) {
+      return res
+        .status(403)
+        .json({ success: false, message: "The case hasn't opened yet." });
+    }
     if (state.isGameOver) {
-      return res.status(403).json({
-        success: false,
-        message: "The case is closed. Submissions are locked.",
-      });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "The case is closed. Submissions are locked.",
+        });
     }
 
     const { questionId, answer } = req.body;
@@ -64,16 +86,17 @@ router.post("/submit", authenticate, async (req, res) => {
     }
 
     await user.save();
-    res.status(200).json({
-      success: true,
-      message: `Answer for Question ${questionId} locked in.`,
-    });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Answer for Question ${questionId} locked in.`,
+      });
   } catch (error) {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
 
-// 3. GET /leaderboard - Public endpoint to check standings
 router.get("/leaderboard", async (req, res) => {
   try {
     const state = await getSystemState();

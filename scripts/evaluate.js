@@ -34,8 +34,10 @@ const evaluate = async () => {
 
       results.push({
         name: user.name,
+        year: user.year,
+        admissionNumber: user.admissionNumber,
         scoreValue: score,
-        scoreStr: `${score}/3`,
+        scoreStr: `${score}/${Object.keys(masterAnswers).length}`,
         timeValue: latestCorrectTime,
         timeStr: latestCorrectTime
           ? new Date(latestCorrectTime).toLocaleTimeString()
@@ -53,15 +55,16 @@ const evaluate = async () => {
     const leaderboard = results.map((res, index) => ({
       rank: index + 1,
       name: res.name,
+      year: res.year,
+      admissionNumber: res.admissionNumber,
       score: res.scoreStr,
       time: res.timeStr,
     }));
 
-    // Save to database and lock the game
     await SystemState.findOneAndUpdate(
       { singletonId: "sherlocked_state" },
       { isGameOver: true, leaderboard: leaderboard },
-      { upsert: true, returnDocument: "after" }, // <--- Fixed
+      { upsert: true, returnDocument: "after" },
     );
 
     console.log("Evaluation complete. Game locked. Leaderboard saved to DB.");
