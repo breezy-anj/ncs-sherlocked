@@ -1,0 +1,1151 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+data/
+  clues.js
+middleware/
+  authenticate.js
+models/
+  SystemState.js
+  User.js
+routes/
+  auth.js
+  game.js
+scripts/
+  evaluate.js
+  reset.js
+  start.js
+.gitignore
+backeend-repomix-output.xml
+package.json
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="middleware/authenticate.js">
+import jwt from "jsonwebtoken";
+
+export default function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: Invalid token" });
+  }
+}
+</file>
+
+<file path="scripts/reset.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+
+// NOTE: from dev: DO NOT RUN THIS SCRIPT UNLESS YOU WANT TO DELETE ALL ENTRIES FROM THE DATABASE
+dotenv.config();
+
+const resetSystem = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    await User.deleteMany({});
+
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameStarted: false, isGameOver: false, leaderboard: [] },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log("\n[WARNING] DATABASE PURGED.");
+    console.log(
+      "[SUCCESS] All detectives deleted. System state reset. Ready for a fresh start.\n",
+    );
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+resetSystem();
+</file>
+
+<file path="scripts/start.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import SystemState from "../models/SystemState.js";
+
+dotenv.config();
+
+const startGame = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameStarted: true, isGameOver: false, leaderboard: [] },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log(
+      "\n[SUCCESS] Event Started! The Case Files are now live and visible to detectives.\n",
+    );
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+startGame();
+</file>
+
+<file path=".gitignore">
+.env
+node_modules
+.DS_Store
+
+# Neovim Swap Files
+*.swp
+*.swo
+</file>
+
+<file path="backeend-repomix-output.xml">
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+data/
+  clues.js
+middleware/
+  authenticate.js
+models/
+  SystemState.js
+  User.js
+routes/
+  auth.js
+  game.js
+scripts/
+  evaluate.js
+  reset.js
+  start.js
+.gitignore
+package.json
+server.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="scripts/reset.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+
+// NOTE: from dev: DO NOT RUN THIS SCRIPT UNLESS YOU WANT TO DELETE ALL ENTRIES FROM THE DATABASE
+dotenv.config();
+
+const resetSystem = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    await User.deleteMany({});
+
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameStarted: false, isGameOver: false, leaderboard: [] },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log("\n[WARNING] DATABASE PURGED.");
+    console.log(
+      "[SUCCESS] All detectives deleted. System state reset. Ready for a fresh start.\n",
+    );
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+resetSystem();
+</file>
+
+<file path="scripts/start.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import SystemState from "../models/SystemState.js";
+
+dotenv.config();
+
+const startGame = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameStarted: true, isGameOver: false, leaderboard: [] },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log(
+      "\n[SUCCESS] Event Started! The Case Files are now live and visible to detectives.\n",
+    );
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+startGame();
+</file>
+
+<file path="middleware/authenticate.js">
+import jwt from "jsonwebtoken";
+
+export default function authenticate(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: No token provided" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: Invalid token" });
+  }
+}
+</file>
+
+<file path="models/SystemState.js">
+import mongoose from "mongoose";
+
+const SystemStateSchema = new mongoose.Schema({
+  singletonId: { type: String, default: "sherlocked_state", unique: true },
+  isGameStarted: { type: Boolean, default: false },
+  isGameOver: { type: Boolean, default: false },
+  leaderboard: [
+    {
+      rank: Number,
+      name: String,
+      score: String,
+      time: String,
+    },
+  ],
+});
+
+export default mongoose.model("SystemState", SystemStateSchema);
+</file>
+
+<file path="models/User.js">
+import mongoose from "mongoose";
+
+const SubmissionSchema = new mongoose.Schema(
+  {
+    questionId: { type: Number, required: true },
+    answer: { type: String, required: true },
+    submittedAt: { type: Date, default: Date.now },
+  },
+  { _id: false },
+);
+
+const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  firstLogin: { type: Date },
+  submissions: [SubmissionSchema],
+});
+
+export default mongoose.model("User", UserSchema);
+</file>
+
+<file path=".gitignore">
+.env
+node_modules
+.DS_Store
+
+# Neovim Swap Files
+*.swp
+*.swo
+</file>
+
+<file path="package.json">
+{
+  "name": "sherlocked-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.0"
+  }
+}
+</file>
+
+<file path="server.js">
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.js";
+import gameRoutes from "./routes/game.js";
+
+dotenv.config();
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/game", gameRoutes);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB (Sherlocked)"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+</file>
+
+<file path="data/clues.js">
+// ye baad mai change hongi. DUMMY DATA
+export const clues = [
+  {
+    id: 1,
+    text: "I hide in plain sight, yet name what I am,You’ve read me already—go back if you canNo object, no person, no place do I claim, For solving this puzzle reveals me by name.",
+  },
+  {
+    id: 2,
+    text: "I am the reason you left your home today,I live in your college but have no classroom,I bring sharp minds together,I am four bits of fun and one whole community,You are sitting inside me right now,What am I?",
+  },
+  {
+    id: 3,
+    text: "I am always in front of you, But can never be seen today, You plan for me, worry about me, Work hard because of me, Yet the moment you reach me, I vanish completely, What am I?",
+  },
+  {
+    id: 4,
+    text: "",
+  },
+];
+
+export const masterAnswers = {
+  1: "riddle",
+  2: "nibble",
+  3: "tomorrow",
+  4: "Riddle",
+};
+</file>
+
+<file path="routes/auth.js">
+import express from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "../models/User.js";
+
+const router = express.Router();
+// REST API - GET , POST
+router.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ name, email, password: hashedPassword });
+    res.status(201).json({ success: true, message: "Detective registered." });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+    console.error(error);
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Detective not found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid password" });
+
+    if (!user.firstLogin) {
+      user.firstLogin = Date.now();
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+    );
+
+    // Return the user object so the frontend can store it
+    res.status(200).json({
+      success: true,
+      token,
+      user: { name: user.name, email: user.email },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+export default router;
+</file>
+
+<file path="routes/game.js">
+import express from "express";
+import authenticate from "../middleware/authenticate.js";
+import { clues } from "../data/clues.js";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+
+const router = express.Router();
+
+const getSystemState = async () => {
+  let state = await SystemState.findOne({ singletonId: "sherlocked_state" });
+  if (!state) {
+    state = await SystemState.create({
+      isGameStarted: false,
+      isGameOver: false,
+      leaderboard: [],
+    });
+  }
+  return state;
+};
+
+// 1. GET /clues - Now hides clues if the game hasn't started
+router.get("/clues", authenticate, async (req, res) => {
+  try {
+    const state = await getSystemState();
+
+    // If the game hasn't started, withhold the clues
+    if (!state.isGameStarted) {
+      return res
+        .status(200)
+        .json({ success: true, isGameStarted: false, clues: [] });
+    }
+
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      success: true,
+      isGameStarted: true,
+      clues,
+      submissions: user ? user.submissions : [],
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+// 2. POST /submit - Block early birds and latecomers
+router.post("/submit", authenticate, async (req, res) => {
+  try {
+    const state = await getSystemState();
+
+    if (!state.isGameStarted) {
+      return res
+        .status(403)
+        .json({ success: false, message: "The case hasn't opened yet." });
+    }
+    if (state.isGameOver) {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "The case is closed. Submissions are locked.",
+        });
+    }
+
+    const { questionId, answer } = req.body;
+    if (!questionId || !answer) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing questionId or answer" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    const existingIndex = user.submissions.findIndex(
+      (sub) => sub.questionId === questionId,
+    );
+
+    if (existingIndex >= 0) {
+      user.submissions[existingIndex].answer = answer;
+      user.submissions[existingIndex].submittedAt = Date.now();
+    } else {
+      user.submissions.push({ questionId, answer, submittedAt: Date.now() });
+    }
+
+    await user.save();
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Answer for Question ${questionId} locked in.`,
+      });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+router.get("/leaderboard", async (req, res) => {
+  try {
+    const state = await getSystemState();
+    res.status(200).json({
+      success: true,
+      isGameOver: state.isGameOver,
+      leaderboard: state.leaderboard,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+export default router;
+</file>
+
+<file path="scripts/evaluate.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+import { masterAnswers } from "../data/clues.js";
+
+dotenv.config();
+
+const evaluate = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Evaluating Sherlocked submissions...\n");
+
+    const users = await User.find({});
+    let results = [];
+
+    for (let user of users) {
+      let score = 0;
+      let latestCorrectTime = 0;
+
+      if (user.submissions && user.submissions.length > 0) {
+        for (let sub of user.submissions) {
+          const expected = masterAnswers[sub.questionId];
+          if (!expected) continue;
+
+          if (sub.answer.toLowerCase().trim() === expected.toLowerCase()) {
+            score++;
+            if (sub.submittedAt > latestCorrectTime) {
+              latestCorrectTime = sub.submittedAt;
+            }
+          }
+        }
+      }
+
+      results.push({
+        name: user.name,
+        scoreValue: score,
+        scoreStr: `${score}/3`,
+        timeValue: latestCorrectTime,
+        timeStr: latestCorrectTime
+          ? new Date(latestCorrectTime).toLocaleTimeString()
+          : "N/A",
+      });
+    }
+
+    // Sort: Highest score first. If tied, lowest (earliest) time wins.
+    results.sort((a, b) => {
+      if (b.scoreValue !== a.scoreValue) return b.scoreValue - a.scoreValue;
+      return a.timeValue - b.timeValue;
+    });
+
+    // Assign ranks
+    const leaderboard = results.map((res, index) => ({
+      rank: index + 1,
+      name: res.name,
+      score: res.scoreStr,
+      time: res.timeStr,
+    }));
+
+    // Save to database and lock the game
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameOver: true, leaderboard: leaderboard },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log("Evaluation complete. Game locked. Leaderboard saved to DB.");
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+evaluate();
+</file>
+
+</files>
+</file>
+
+<file path="package.json">
+{
+  "name": "sherlocked-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.3.0"
+  }
+}
+</file>
+
+<file path="server.js">
+import express from "express";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.js";
+import gameRoutes from "./routes/game.js";
+
+dotenv.config();
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
+app.use("/api/game", gameRoutes);
+
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("Connected to MongoDB (Sherlocked)"))
+  .catch((err) => console.error("MongoDB connection error:", err));
+
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+</file>
+
+<file path="models/SystemState.js">
+import mongoose from "mongoose";
+
+const SystemStateSchema = new mongoose.Schema({
+  singletonId: { type: String, default: "sherlocked_state", unique: true },
+  isGameStarted: { type: Boolean, default: false },
+  isGameOver: { type: Boolean, default: false },
+  leaderboard: [
+    {
+      rank: Number,
+      name: String,
+      year: Number,
+      admissionNumber: String,
+      score: String,
+      time: String,
+    },
+  ],
+});
+
+export default mongoose.model("SystemState", SystemStateSchema);
+</file>
+
+<file path="models/User.js">
+import mongoose from "mongoose";
+
+const SubmissionSchema = new mongoose.Schema(
+  {
+    questionId: { type: Number, required: true },
+    answer: { type: String, required: true },
+    submittedAt: { type: Date, default: Date.now },
+  },
+  { _id: false },
+);
+
+const UserSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  zealId: { type: String, required: true, unique: true },
+  year: { type: Number, required: true },
+  admissionNumber: { type: String, required: true },
+  password: { type: String, required: true },
+  firstLogin: { type: Date },
+  submissions: [SubmissionSchema],
+});
+
+export default mongoose.model("User", UserSchema);
+</file>
+
+<file path="data/clues.js">
+export const clues = [
+  {
+    id: 1,
+    text: "I hide in plain sight, yet name what I am,\nYou’ve read me already—go back if you can.\nNo object, no person, no place do I claim,\nFor solving this puzzle reveals me by name.",
+  },
+  {
+    id: 2,
+    text: "I am the reason you left your home today,\nI live in your college but have no classroom,\nI bring sharp minds together,\nI am four bits of fun and one whole community,\nYou are sitting inside me right now,\nWhat am I?",
+  },
+  {
+    id: 3,
+    text: "I am always in front of you, But can never be seen today, You plan for me, worry about me, Work hard because of me, Yet the moment you reach me, I vanish completely, What am I?",
+  },
+  {
+    id: 4,
+    text: "He once faked his own death,\nToday his name is very much alive,\nHe carried a magnifying glass,\nToday you carry only your mind,\nHis game was crime scenes,\nYour game is this competition,\nHis enemy was Moriarty,\nYour enemy is this question,\nWho are you both chasing?",
+  },
+  {
+    id: 5,
+    text: "I have no mouth, yet I help you speak,\nNo legs, yet far places I let you reach.\nI hold your world inside my frame,\nTap me once—I know your name.\nI glow at night, I ring all day,\nLose me once, and panic comes your way.",
+  },
+  {
+    id: 6,
+    text: "From ink on sheets to tools you forget,\nI solve quiet crises you haven’t met.\nBefore big days, I’m part of the routine,\nA silent helper, often unseen.",
+  },
+  {
+    id: 7,
+    text: "Near your college, yet not a class,\nWhere lectures fade and free hours pass.\nNot for work, though offices rise,\nBut for JSS souls, it’s the real prize.\nCouples linger, groups create their scene,\nMore of an adda than it has ever been.\nWhat am I?",
+  },
+  {
+    id: 8,
+    text: "Between three silent giants I lie,\nNot built for work, yet never shy.\nWhen lectures fade and footsteps roam,\nWandering minds soon call me home.\n\nNo walls enclose, yet circles form,\nOf laughter loud and debates warm.\nUnder patient trees I keep\nStories shared and secrets deep.\n\nNeither class nor café true,\nYet many hours vanish in view.\nA pause between the rush of days,\nWhere shade and chatter gently stay.\n\nWhat place am I?",
+  },
+];
+
+export const masterAnswers = {
+  1: "Riddle",
+  2: "Nibble",
+  3: "Tomorrow",
+  4: "Sherlock Holmes",
+  5: "phone",
+  6: "Amenities",
+  7: "Stellar",
+  8: "Courtyard",
+};
+</file>
+
+<file path="routes/auth.js">
+import express from "express";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import User from "../models/User.js";
+
+const router = express.Router();
+
+const getSystemState = async () => {
+  const SystemState = await import("../models/SystemState.js").then(
+    (m) => m.default,
+  );
+  let state = await SystemState.findOne({ singletonId: "sherlocked_state" });
+  if (!state) {
+    state = await SystemState.create({
+      isGameStarted: false,
+      isGameOver: false,
+      leaderboard: [],
+    });
+  }
+  return state;
+};
+
+router.post("/register", async (req, res) => {
+  try {
+    const { name, zealId, year, admissionNumber, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      zealId,
+      year,
+      admissionNumber,
+      password: hashedPassword,
+    });
+
+    const token = jwt.sign(
+      { id: user._id, zealId: user.zealId },
+      process.env.JWT_SECRET,
+    );
+
+    const state = await getSystemState();
+
+    res.status(201).json({
+      success: true,
+      message: "Detective registered.",
+      token,
+      user: { name: user.name, zealId: user.zealId },
+      isGameOver: state.isGameOver,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.post("/login", async (req, res) => {
+  try {
+    const { zealId, password } = req.body;
+    const user = await User.findOne({ zealId });
+
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: "Detective not found" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid password" });
+
+    if (!user.firstLogin) {
+      user.firstLogin = Date.now();
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { id: user._id, zealId: user.zealId },
+      process.env.JWT_SECRET,
+    );
+
+    const state = await getSystemState();
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: { name: user.name, zealId: user.zealId },
+      isGameOver: state.isGameOver,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+export default router;
+</file>
+
+<file path="routes/game.js">
+import express from "express";
+import authenticate from "../middleware/authenticate.js";
+import { clues } from "../data/clues.js";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+
+const router = express.Router();
+
+const getSystemState = async () => {
+  let state = await SystemState.findOne({ singletonId: "sherlocked_state" });
+  if (!state) {
+    state = await SystemState.create({
+      isGameStarted: false,
+      isGameOver: false,
+      leaderboard: [],
+    });
+  }
+  return state;
+};
+
+// 1. GET /clues - Now hides clues if the game hasn't started
+router.get("/clues", authenticate, async (req, res) => {
+  try {
+    const state = await getSystemState();
+
+    // If the game hasn't started, withhold the clues
+    if (!state.isGameStarted) {
+      return res
+        .status(200)
+        .json({ success: true, isGameStarted: false, clues: [] });
+    }
+
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      success: true,
+      isGameStarted: true,
+      clues,
+      submissions: user ? user.submissions : [],
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+// 2. POST /submit - Block early birds and latecomers
+router.post("/submit", authenticate, async (req, res) => {
+  try {
+    const state = await getSystemState();
+
+    if (!state.isGameStarted) {
+      return res
+        .status(403)
+        .json({ success: false, message: "The case hasn't opened yet." });
+    }
+    if (state.isGameOver) {
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "The case is closed. Submissions are locked.",
+        });
+    }
+
+    const { questionId, answer } = req.body;
+    if (!questionId || !answer) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing questionId or answer" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+
+    const existingIndex = user.submissions.findIndex(
+      (sub) => sub.questionId === questionId,
+    );
+
+    if (existingIndex >= 0) {
+      user.submissions[existingIndex].answer = answer;
+      user.submissions[existingIndex].submittedAt = Date.now();
+    } else {
+      user.submissions.push({ questionId, answer, submittedAt: Date.now() });
+    }
+
+    await user.save();
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: `Answer for Question ${questionId} locked in.`,
+      });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+router.get("/leaderboard", async (req, res) => {
+  try {
+    const state = await getSystemState();
+    res.status(200).json({
+      success: true,
+      isGameOver: state.isGameOver,
+      leaderboard: state.leaderboard,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+});
+
+export default router;
+</file>
+
+<file path="scripts/evaluate.js">
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import User from "../models/User.js";
+import SystemState from "../models/SystemState.js";
+import { masterAnswers } from "../data/clues.js";
+
+dotenv.config();
+
+const evaluate = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Evaluating Sherlocked submissions...\n");
+
+    const users = await User.find({});
+    let results = [];
+
+    for (let user of users) {
+      let score = 0;
+      let latestCorrectTime = 0;
+
+      if (user.submissions && user.submissions.length > 0) {
+        for (let sub of user.submissions) {
+          const expected = masterAnswers[sub.questionId];
+          if (!expected) continue;
+
+          if (sub.answer.toLowerCase().trim() === expected.toLowerCase()) {
+            score++;
+            if (sub.submittedAt > latestCorrectTime) {
+              latestCorrectTime = sub.submittedAt;
+            }
+          }
+        }
+      }
+
+      results.push({
+        name: user.name,
+        year: user.year,
+        admissionNumber: user.admissionNumber,
+        scoreValue: score,
+        scoreStr: `${score}/${Object.keys(masterAnswers).length}`,
+        timeValue: latestCorrectTime,
+        timeStr: latestCorrectTime
+          ? new Date(latestCorrectTime).toLocaleTimeString()
+          : "N/A",
+      });
+    }
+
+    // Sort: Highest score first. If tied, lowest (earliest) time wins.
+    results.sort((a, b) => {
+      if (b.scoreValue !== a.scoreValue) return b.scoreValue - a.scoreValue;
+      return a.timeValue - b.timeValue;
+    });
+
+    // Assign ranks
+    const leaderboard = results.map((res, index) => ({
+      rank: index + 1,
+      name: res.name,
+      year: res.year,
+      admissionNumber: res.admissionNumber,
+      score: res.scoreStr,
+      time: res.timeStr,
+    }));
+
+    await SystemState.findOneAndUpdate(
+      { singletonId: "sherlocked_state" },
+      { isGameOver: true, leaderboard: leaderboard },
+      { upsert: true, returnDocument: "after" },
+    );
+
+    console.log("Evaluation complete. Game locked. Leaderboard saved to DB.");
+    process.exit(0);
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+evaluate();
+</file>
+
+</files>
