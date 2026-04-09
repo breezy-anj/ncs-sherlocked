@@ -40,7 +40,9 @@ const evaluate = async () => {
         scoreStr: `${score}/${Object.keys(masterAnswers).length}`,
         timeValue: latestCorrectTime,
         timeStr: latestCorrectTime
-          ? new Date(latestCorrectTime).toLocaleTimeString()
+          ? new Date(latestCorrectTime).toLocaleTimeString("en-IN", {
+              timeZone: "Asia/Kolkata",
+            })
           : "N/A",
       });
     }
